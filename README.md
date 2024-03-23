@@ -1,4 +1,4 @@
-# iRAP-UserInterface Example 
+# iRAP-Minirescue-GUI Example 
 
 ## Installation
 
@@ -15,12 +15,12 @@
     ```
 3. Clone the repository:
     ```bash
-    git clone https://github.com/NonStopBle/iRAP-UserInterface-Example.git
+    git clone https://github.com/NonStopBle/iRAP-Minirescue-GUI.git
     ```
 
 4. Change directory to the project folder:
     ```bash
-    cd iRAP-UserInterface-Example/
+    cd iRAP-Minirescue-GUI/
     ```
 5. Open the project in Visual Studio Code in current directory:
     ```bash
