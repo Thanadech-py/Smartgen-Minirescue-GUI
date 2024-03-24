@@ -34,6 +34,11 @@
     yarn install
     ```
 
+7. Once all dependencies are installed, start the project:
+    ```bash
+    yarn start
+    ```
+
 ## Usage 
 
 Go to configs/compose/Config.ts and edit your ip address to your rosbridge server device ip address
@@ -41,9 +46,3 @@ Go to configs/compose/Config.ts and edit your ip address to your rosbridge serve
 ![image](https://github.com/NonStopBle/iRAP-Minirescue-GUI/assets/27502816/96e215f5-39cf-44e5-b78f-4283d6ef90c4)
 
 
-
-
-7. Once all dependencies are installed, start the project:
-    ```bash
-    yarn start
-    ```
