@@ -45,4 +45,7 @@ Go to configs/compose/Config.ts and edit your ip address to your rosbridge serve
 
 ![image](https://github.com/NonStopBle/iRAP-Minirescue-GUI/assets/27502816/96e215f5-39cf-44e5-b78f-4283d6ef90c4)
 
+*** You can't ddos my ip in this picture because that is local ip address ***
+
+
 
