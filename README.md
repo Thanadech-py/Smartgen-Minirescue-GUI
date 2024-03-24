@@ -13,7 +13,7 @@
 
 2. Next, install Yarn:
     ```bash
-    npm install --global yarn
+    sudo npm install --global yarn
     ```
 3. Clone the repository:
     ```bash
