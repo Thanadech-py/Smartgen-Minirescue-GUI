@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import * as ROSLIB from 'roslib';
 
 import './css/image.css'
-import ConnectionLostIMG from './resources/connection_lost.jpg'
+import ConnectionLostIMG from './resources/connection_lost.png'
 
 interface IProps {
   ros : ROSLIB.Ros

@@ -5,11 +5,11 @@ import Draggable from 'react-draggable';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 import background_map from './resources/robot_background_x.png'
-import robot from '../FlipperVisualization/resources/robot_body.png'
+import robot from '../FlipperVisualization/resources/Body.png'
 
 
-import robot_lift from '../FlipperVisualization/resources/robot_flipper.png'
-// import baseMapA from './resources/baseMapA.jpg';
+import robot_lift1 from '../FlipperVisualization/resources/Flipper Front.png'
+import robot_lift2 from '../FlipperVisualization/resources/Flipper Rear.png'
 
 import 'bootstrap/dist/css/bootstrap.css';
 import configs from '../../configs';
@@ -17,7 +17,8 @@ import ROSLIB from 'roslib';
 
 interface MapProps {
    pitchDegree : number
-   flipperDegree : number
+   flipperDegreeFront : number
+   flipperDegreeRear : number
 }
 
 interface MapState {
@@ -42,12 +43,6 @@ class FlipperVisualization extends Component<MapProps, MapState> {
         // this.interval = setInterval(this.moveRobot)
     }
 
-    componentWillUnmount() {
-
-    }
-
-
-
     robotRenderComponents = () => {
 
 
@@ -55,7 +50,7 @@ class FlipperVisualization extends Component<MapProps, MapState> {
             position: 'absolute',
             top: `${40}px`, //robotImagePosition.y
             left: `${10}px`, //robotImagePosition.x
-            width: '200px',
+            width: '800px',
             height: 'auto',
             justifyContent: 'center',
             // border: '1px solid red',
@@ -64,15 +59,27 @@ class FlipperVisualization extends Component<MapProps, MapState> {
 
         const LiftImageStyleA: React.CSSProperties = {
             position: 'relative',
-            top: `${120}px`,  //liftImagePosition.y
-            left: `${-30}px`, // liftImagePosition.x
+            top: `${74}px`,  //liftImagePosition.y
+            left: `${10}px`, // liftImagePosition.x
             transformOrigin: '75% 50%',
-            transform: `rotate(${this.props.flipperDegree}deg) translate(0%,0%)`,
+            transform: `rotate(${this.props.flipperDegreeFront}deg) translate(0%,0%)`,
             width: '100px',
-            height: '70px',
+            height: 'auto',
             justifyContent: 'center',
             // border: '1px solid red',
             
+        };
+
+        const LiftImageStyleB: React.CSSProperties = {
+            position: 'relative',
+            top: `${21}px`,  //liftImagePosition.y
+            right: `${-100}px`, // liftImagePosition.x
+            transformOrigin: '75% 50%',
+            transform: `rotate(${this.props.flipperDegreeRear}deg) translate(0%,0%)`,
+            width: '100px',
+            height: 'auto',
+            justifyContent: 'center',
+            // border: '1px solid red',
         };
 
         const painterConfig: React.CSSProperties = {
@@ -108,7 +115,7 @@ class FlipperVisualization extends Component<MapProps, MapState> {
                         }}
                     />
                     <Image
-                        src={robot_lift}
+                        src={robot_lift1}
                         alt="Robot"
                         style={LiftImageStyleA}
                         className="robot-image img-fluid"
@@ -116,6 +123,15 @@ class FlipperVisualization extends Component<MapProps, MapState> {
                         onClick={() => {
                         }}
                     />
+                    <Image
+                        src={robot_lift2}
+                        alt="Robot"
+                        style={LiftImageStyleB}
+                        className="robot-image img-fluid"
+                        ref={this.robotImageRef}
+                        onClick={() => {
+                        }}
+                    />  
                 </div>
             </div>
         </>

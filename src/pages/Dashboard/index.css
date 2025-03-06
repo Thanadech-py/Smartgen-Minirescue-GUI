@@ -13,16 +13,17 @@
 
 .body {
     margin: 0 auto;
-    background-color: #474747;
+    background-color: #111025ec;
     height: 100vh;
     background-size: cover;
 }
 
 .right {
     display: flex;
-    justify-content: center;
+    justify-content: right;
+    margin-right: 6%;
     /* horizontally center */
-    align-items: center;
+    align-items: center
     /* vertically center */
 }
 
@@ -64,43 +65,22 @@
     display: flex;
     position: relative;
     /* border-bottom: 2px solid #474747; */
-    background-color: #333333;
+    background-color: #ffffff;
     width: 100%;
-    height: 5%;
+    height: 65px;
     align-items: center;
     justify-content: space-between;
     /* Align items to the start and end of the container */
 }
 
 .logo {
-    margin-left: 40px;
+    margin-left: 60px;
+    justify-content: center;
 }
 
 .logo img {
-    width: 80px;
-    height: 35px;
-}
-
-.ping {
-    display: flex;
-    position: relative;
-    gap: 20px;
-    /* border: 1px solid black; */
-    margin-right: 40px;
-    /* align-items: center;
-    text-align: center;
-
-    justify-content: center; */
-}
-
-.ping img {
-    width: 30px;
-    height: 30px;
-}
-
-.ping h3 {
-    color: white;
-    font-size: 20px;
+    width: 170px;
+    height: 100px;
 }
 
 .center {
@@ -115,7 +95,6 @@
     height:52%;
     padding: 0.5%;
 }
-
 .camerabox {
     display: flex;
     flex-direction: row;
@@ -127,6 +106,27 @@
     height: 100%;
 }
 
+.cameraboxcv3 {
+    display: grid;
+    flex-direction: column;
+    /* horizontally center */
+    justify-content: center;
+    gap : 2%;
+    width: 80%;
+    height: 100%;
+}
+
+.camerabox12 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    /* horizontally center */
+    justify-content: center;
+    gap: 0.4%;
+    width: 80%;
+    height: 100%;
+}
+
 .camera1,
 .camera2 {
     display: flex;
@@ -135,8 +135,20 @@
     justify-content: center;
     border: 1px solid black;
     background-color: black;
-    width: 800px;
+    width: 700px;
     height: 100%;
+    box-shadow: rgba(0, 0, 0, 0.60) 0px 5px 15px;
+    overflow: hidden; 
+}
+.camera3 {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid black;
+    background-color: black;
+    width: 101%;
+    height: 240px;
     box-shadow: rgba(0, 0, 0, 0.60) 0px 5px 15px;
     overflow: hidden; 
 }
@@ -145,80 +157,95 @@
 .bottom {
     display: flex;
     position: relative;
-    justify-content: center;
+    justify-content: right;
     align-items: center;
     /* border: 1px solid green; */
-    height: 35%;
-    width: 100%;
+    height: 40%;
+    width: 85%;
 }
 
 .bottom-flag {
     display: flex;
     width: 100%;
     height: 100%;
-    gap: 0.4%;
+    gap: 5%;
     /* border: 1px solid red; */
-    padding-left: 1%;
-    /* padding-right: 0.4%; */
+    padding-right: 0.2%;
 }
 
-.bleft,
-.bcenter,
+.bleft {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px solid red; */
+    width: 100%;
+    height: 100%;
+    gap: 2%;
+    margin-left: 5px;
+}
+.bcenter{
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    /* border: 1px solid red; */
+    width: 100%;
+    height: 100%;
+}
 .bright {
     display: flex;
     position: relative;
     justify-content: center;
-    width: 33%;
-    height: 100%;
+    align-items: center;
+    width: 100%;
+    height: 6%;
+    margin-top: 15px;
+    margin-left: 46%;
     /* border: 1px solid red; */
 
 }
 
 .boxcv {
     width: 100%;
-    height: 100%;
+    height: 335px;
     display: block;
-    gap: 1%;
+    gap: 0.5%;
+    justify-content: left;
 }
 
-.cv,
+.cv {
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid black;
+    background-color: black;
+    width: 101%;
+    height: 70%;
+    box-shadow: rgba(0, 0, 0, 0.60) 0px 5px 15px;
+    overflow: hidden; 
+}
 .flipperState {
     display: flex;
     position: relative;
     justify-content: center;
-    align-items: center;
+    align-items: last center;
     background-color: black;
     width: 100%;
-    height: 100%;
+    height: 70%;
     box-shadow: rgba(0, 0, 0, 0.60) 0px 5px 15px;
     overflow: hidden; 
 }
 
-
-.boxcv,
 .boxflipper {
     /* border: 1px solid green; */
     height: 100%;
-    width: 100%;
+    width: 450px;
     /* box-shadow: rgba(0, 0, 0, 0.60) 0px 5px 15px; */
-    /* border-radius: 5%; */
+    margin-left: 140px;
 }
-
-.box-button,
-.flipperLabel,
-.speedbox {
-    display: flex;
-    position: relative;
-    align-items: center;
-    justify-content: center;
-    /* border: 1px solid red; */
-    /* background-color: #202020; */
-    width: 100%;
-    height: 100%;
-}
-
-.flipperLabel h2,
-.speedbox h2 {
+.statusLabel h2 {
     display: flex;
     position: relative;
     justify-content: center;
@@ -228,10 +255,9 @@
     color: white;
     font-size: 20px;
     /* border: 1px solid red; */
-    width: 80%;
-    height: 60%;
+    width: 300px;
+    margin-top: 15px;
     box-shadow: rgba(0, 0, 0, 0.60) 0px 5px 15px;
-    
 }
 
 .bright {
@@ -239,118 +265,62 @@
     /* border: 1px solid red; */
 }
 
-.statusbox,
-.startbox {
-    display: flex;
-    /* border: 1px solid green; */
-    height: 25%;
-    width: 100%;
-    gap: 1.5%;
-
-}
-
 .statusbox {
-    height: 50%;
-}
-
-.joybox,
-.robotbox {
-    display: block;
-    /* border: 1px solid red; */
-    width: 49%;
-    background-color: #202020;
-    box-shadow: rgba(0, 0, 0, 0.60) 0px 5px 15px;
+    display: flex;
+    position: relative;
+    justify-content: right;
+    align-items: center;
 }
 
 .startbox {
     display: flex;
     position: relative;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    gap: 15px;  
+    margin-right: 40px;
     /* border: 1px solid red; */
 }
 
 .startbox button {
-    width: 80%;
-    height: 50%;
+    width: 180;
+    height: 45px;
     font-weight: bold;
     font-size: 20px;
     cursor: pointer;
     box-shadow: rgba(0, 0, 0, 0.60) 0px 5px 15px;
-}
-
-
-.statusBar {
-    display: flex;
-    position: relative;
-    justify-content: center;
-    align-items: center;
+    text-align: center;
     
-    /* border: 1px solid blue; */
-    height: 8%;
-    /* justify-content:space-between; */
 }
 
-.box-button button {
-    cursor: pointer;
-    width: 60%;
-    height: 60%;
-    font-style: normal;
-    font-size: 20px;
-    box-shadow: rgba(0, 0, 0, 0.60) 0px 5px 15px;
-}
-
-.joybox,
-.robotbox {
-    display: block;
-}
-
-.joyflag,
 .robotflag {
     display: flex;
     position: relative;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    top: -10%;
+    width: 15%;
+    top: 10%;
 }
 
 .robotflag {
     top: 5%;
 
 }
-
-.joybox h2 {
-    display: flex;
-    position: relative;
-    color: white;
-    justify-content: center;
-    /* border: 1px solid red; */
-    top: -12%;
-    font-size: 120%;
-}
-
-.joybox img {
-    display: flex;
-    position: relative;
-    /* top: -50%; */
-    width: 50%;
-    height: 80%;
-}
-
 .robotflag img {
     display: flex;
     position: relative;
     width: 35%;
-    height: 35%;
+    height: 20%;
 }
 
-.robotbox h2 {
+.robotflag h3 {
     display: flex;
     position: relative;
-    color: white;
-    justify-content: center;
+    color: rgb(18, 5, 92);
+    justify-content: right;
     /* border: 1px solid red; */
     top: 15%;
     font-size: 120%;
+    margin-left: 25px;
+    margin-top: 10px;
 }

@@ -14,7 +14,7 @@ const ConnectToRosMasterExample: React.FC = () => {
   const { setROS } = useROS();
 
   useEffect(() => {
-    const masterUrl = 'ws://0.0.0.0:9090/'; // Replace with your ROS master URL
+    const masterUrl = 'ws://192.168.100.100:9090/'; // Replace with your ROS master URL
     const ros = new ROSLIB.Ros({ url: masterUrl });
 
     ros.on('connection', () => {

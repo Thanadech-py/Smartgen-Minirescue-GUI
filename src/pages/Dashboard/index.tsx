@@ -3,11 +3,8 @@ import React, { Component } from 'react';
 import ROSLIB from 'roslib';
 
 import logo from './image/logo.png';
-import wifi_white from './image/wifi_white.png';
-import settings from './image/setting.png';
+import wifi from './image/wifi.png';
 import joy from './image/joy.png';
-import connect from './image/connect.png';
-import connectionLost from './image/connection_lost.jpg';
 
 import { Container, Row, Col, Button, Image } from 'react-bootstrap';
 import configs from '../../configs';
@@ -34,9 +31,11 @@ interface IState {
   attachState: boolean
   detection: boolean
   startButton: boolean
-  readRobotFlipperAngle: number
+  readRobotFlipperAngleFront: number
+  readRobotFlipperAngleRear: number
   readRobotSpeedLeft: number
   readRobotSpeedRight: number
+  readRobotSpeed : number
   readRobotPitchAngle : number
   previousUpdate : number;
 }
@@ -54,9 +53,11 @@ class App extends Component<IProps, IState> {
       joyConnection: false,
       startButton: false,
       detection: false,
-      readRobotFlipperAngle: 0,
+      readRobotFlipperAngleFront: 0,
+      readRobotFlipperAngleRear: 0,
       readRobotSpeedRight: 0,
       readRobotSpeedLeft: 0,
+      readRobotSpeed : 0,
       readRobotPitchAngle : 0,
       previousUpdate : 0,
     }
@@ -102,16 +103,23 @@ class App extends Component<IProps, IState> {
         data: [0,0,0,0],
       };
 
-      let flipperAngle = Math.floor(data.data[2] * (360/140)  % 360) > 180 ?  Math.floor(data.data[2] * (360/140)  % 360) - 360 : Math.floor(data.data[2] * (360/140)  % 360)
+      let flipperAngleFront = Math.floor(data.data[2] * (360/140)  % 360) > 180 ?  Math.floor(data.data[2] * (360/140)  % 360) - 360 : Math.floor(data.data[2] * (360/140)  % 360)
+      let flipperAngleRear = Math.floor(data.data[3] * (360/140)  % 360) > 180 ?  Math.floor(data.data[3] * (360/140)  % 360) - 360 : Math.floor(data.data[3] * (360/140)  % 360)
 
       this.setState({readRobotSpeedLeft : Math.floor(data.data[0] / 35.255) , readRobotSpeedRight : Math.floor(data.data[1] / 35.255)} )
       this.setState({readRobotPitchAngle : data.data[3]})
 
-      if(flipperAngle - this.state.previousUpdate > 10){
+      if(flipperAngleFront - this.state.previousUpdate > 10){
         console.log("updated")
-        this.setState({readRobotFlipperAngle : flipperAngle})
+        this.setState({readRobotFlipperAngleFront : flipperAngleFront})
       }
-      this.setState({previousUpdate : flipperAngle})
+      if(flipperAngleRear - this.state.previousUpdate > 10){
+        console.log("updated")
+        this.setState({readRobotFlipperAngleRear : flipperAngleRear})
+      }
+
+
+      this.setState({previousUpdate : flipperAngleFront})
       // const format = compressedImageMessage.format;
       // const imageData = compressedImageMessage.data;
 
@@ -171,55 +179,60 @@ class App extends Component<IProps, IState> {
             </div>
           </div>
           <div className="right">
-            <div className="ping">
-              {/* <img src={wifi_white} alt="" /> */}
-              {/* <h3>100 ms</h3> */}
+            <div className="robotflag">
+              <img src={wifi} />
+              <img src={joy} />
+              <h3>Robot Status: {this.state.robotConnection ? "Connected" : "Disconnected"}</h3>
+              <h3>Joy Status: {this.state.joyConnection ? "Connected" : "Disconnected"}</h3>
             </div>
+              
           </div>
 
         </div>
         <div className="center">
-          <div className="camerabox">
+          <div className='camerabox'>
+            <div className="camerabox12">
             <div className="camera1">
               <ImageViewer ros={this.state.ros} ImageCompressedTopic={'/usb_cam/image_raw/compressed'} height={'100%'} width={'95%'} rotate={180} hidden={false}></ImageViewer>
             </div>
             <div className="camera2">
+              <ImageViewer ros={this.state.ros} ImageCompressedTopic={'/usb_cam/image_raw'} height={'100%'} width={'95%'} rotate={180} hidden={false}></ImageViewer>
+            </div>
+          </div>
+          <div className="cameraboxcv3">
+            <div className="camera3"> 
               <ImageViewer ros={this.state.ros} ImageCompressedTopic={'/usb_cam/image_raw/compressed'} height={'100%'} width={'95%'} rotate={180} hidden={false}></ImageViewer>
+            </div>
+            <div className="boxcv">
+              <div className="cv">
+                  <ImageViewer ros={this.state.ros} ImageCompressedTopic={'/detect_marker/image_raw/compressed'} height={'100%'} width={'95%'} rotate={180} hidden={!this.state.detection} ></ImageViewer>
+                </div>
+              </div>
             </div>
           </div>
         </div>
         <div className="bottom">
           <div className="bottom-flag">
             <div className="bleft">
-              <div className="boxcv">
-                <div className="cv">
-                  <ImageViewer ros={this.state.ros} ImageCompressedTopic={'/detect_marker/image_raw/compressed'} height={'100%'} width={'95%'} rotate={180} hidden={!this.state.detection} ></ImageViewer>
+              <div className="boxflipper">
+                <div className="flipperState">
+                  <FlipperVisualization flipperDegreeFront={this.state.readRobotFlipperAngleFront} pitchDegree={this.state.readRobotPitchAngle} flipperDegreeRear={this.state.readRobotFlipperAngleRear}></FlipperVisualization>
                 </div>
               </div>
             </div>
             <div className="bcenter">
-              <div className="boxflipper">
-                <div className="flipperState">
-                  <FlipperVisualization flipperDegree={this.state.readRobotFlipperAngle} pitchDegree={this.state.readRobotPitchAngle}></FlipperVisualization>
-                </div>
-              </div>
+
             </div>
-            <div className="bright">
-              <div className="statusbox">
-                <div className="joybox">
-                  <div className="joyflag">
-                    <img src={joy} />
-                  </div>
-                  <h2>Joy Status: {this.state.joyConnection ? "Connected" : "Disconnected"}</h2>
-                </div>
-                <div className="robotbox">
-                  <div className="robotflag">
-                    <img src={connect} />
-                  </div>
-                  <h2>Robot Status: {this.state.robotConnection ? "Connected" : "Disconnected"}</h2>
-                </div>
+            <div className="bright"> 
+              <div className="statusLabel">
+                <h2>Flipper Front: {this.state.readRobotFlipperAngleFront}°, Flipper Rear: {this.state.readRobotFlipperAngleRear}°</h2>
+                <h2>Pitch: {this.state.readRobotPitchAngle}°</h2>
+                <h2>Robot Speed: {this.state.readRobotSpeed} Km/h</h2>
+                <h2>SpeedL: {this.state.readRobotSpeedLeft} rpm , SpeedR: {this.state.readRobotSpeedRight} rpm</h2>
               </div>
-              <div className="startbox">
+              
+              <div className="statusbox">
+                <div className="startbox">
                 {
                   !this.state.startButton ? <Button variant="primary" onClick={() => {
                     this.setState({ startButton: !this.state.startButton })
@@ -229,28 +242,15 @@ class App extends Component<IProps, IState> {
                     this.setState({ startButton: !this.state.startButton })
                   }}>
                     {!this.state.startButton ? "Start" : "Stop"}
-                  </Button>
+                  </Button> 
                 }
-
-              </div>
+                <Button variant="primary" onClick={() => {this.setState({ detection: !this.state.detection })}}>{this.state.detection ? "Detection Off" : "Detection On"}</Button>
+                </div>
+              </div> 
             </div>
           </div>
         </div>
-        <div className="statusBar">
-          <div className="box-button">
-            <Button variant="primary" onClick={() => {
-              this.setState({ detection: !this.state.detection })
-            }}>
-              {this.state.detection ? "Detection Off" : "Detection On"}
-            </Button>
-          </div>
-          <div className="flipperLabel">
-            <h2>Flipper: {this.state.readRobotFlipperAngle}°</h2>
-          </div>
-          <div className="speedbox">
-            <h2>SpeedL: {this.state.readRobotSpeedLeft} rpm , SpeedR: {this.state.readRobotSpeedRight} rpm</h2>
-          </div>
-        </div>
+        
       </body>
     );
   }
