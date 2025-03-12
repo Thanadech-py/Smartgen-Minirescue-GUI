@@ -12,7 +12,6 @@ import configs from '../../configs';
 import { initROSMasterURI } from '../../components/ROS/Connector/ROSConnector';
 import ImageViewer from '../../components/ROS/ImageViewer';
 import GamepadComponent from '../../components/GamepadAPI';
-import FlipperVisualization from '../../components/FlipperVisualization';
 
 interface IProps { }
 
@@ -24,6 +23,7 @@ interface IState {
   attachState: boolean;
   detection: boolean;
   startButton: boolean;
+  showGazebo: boolean;
   readRobotFlipperAngleFront: number;
   readRobotFlipperAngleRear: number;
   readRobotSpeedLeft: number;
@@ -34,8 +34,12 @@ interface IState {
 }
 
 class App extends Component<IProps, IState> {
+  private gazeboViewer: React.RefObject<HTMLIFrameElement>;
+
   constructor(props: IProps) {
     super(props);
+
+    this.gazeboViewer = React.createRef();
 
     this.state = {
       ros: initROSMasterURI(configs.ROSMasterURL.url),
@@ -45,6 +49,7 @@ class App extends Component<IProps, IState> {
       joyConnection: false,
       startButton: false,
       detection: false,
+      showGazebo: false, // Default to not showing Gazebo
       readRobotFlipperAngleFront: 0,
       readRobotFlipperAngleRear: 0,
       readRobotSpeedRight: 0,
@@ -119,12 +124,17 @@ class App extends Component<IProps, IState> {
     });
   }
 
+  toggleGazebo = () => {
+    this.setState(prevState => ({ showGazebo: !prevState.showGazebo }));
+  }
+
   render() {
     const { 
       robotConnection, 
       joyConnection, 
       startButton, 
       detection,
+      showGazebo,
       readRobotFlipperAngleFront,
       readRobotFlipperAngleRear,
       readRobotPitchAngle,
@@ -167,138 +177,142 @@ class App extends Component<IProps, IState> {
         </header>
         
         <main className="app-content">
-          <div className="camera-container">
-            <div className="primary-cameras">
-              <div className="camera-view">
-                <h3 className="camera-title">Front Camera</h3>
-                <ImageViewer 
-                  ros={this.state.ros} 
-                  ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
-                  height={'100%'} 
-                  width={'100%'} 
-                  rotate={360} 
-                  hidden={false}
-                />
+            <div className="camera-container">
+              <div className="primary-cameras">
+                <div className="camera-view">
+                  <h3 className="camera-title">Front Camera</h3>
+                  <ImageViewer 
+                    ros={this.state.ros} 
+                    ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
+                    height={'100%'} 
+                    width={'100%'} 
+                    rotate={360} 
+                    hidden={false}
+                  />
+                </div>
+                <div className="camera-view">
+                  <h3 className="camera-title">Rear Camera</h3>
+                  <ImageViewer 
+                    ros={this.state.ros} 
+                    ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
+                    height={'100%'} 
+                    width={'100%'} 
+                    rotate={360} 
+                    hidden={false}
+                  />
+                </div>
               </div>
-              <div className="camera-view">
-                <h3 className="camera-title">Rear Camera</h3>
-                <ImageViewer 
-                  ros={this.state.ros} 
-                  ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
-                  height={'100%'} 
-                  width={'100%'} 
-                  rotate={360} 
-                  hidden={false}
-                />
+              
+              <div className="secondary-cameras">
+                <div className="camera-view">
+                  <h3 className="camera-title">QR Detection</h3>
+                  <ImageViewer 
+                    ros={this.state.ros} 
+                    ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
+                    height={'100%'} 
+                    width={'100%'} 
+                    rotate={360} 
+                    hidden={detection}
+                  />
+                </div>
+                <div className="camera-view">
+                  <h3 className="camera-title">Hazmat Detection</h3>
+                  <ImageViewer 
+                    ros={this.state.ros} 
+                    ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
+                    height={'100%'} 
+                    width={'100%'} 
+                    rotate={360} 
+                    hidden={detection}
+                  />
+                </div>
+                <div className="camera-view">
+                  <h3 className="camera-title">Color Test</h3>
+                  <ImageViewer 
+                    ros={this.state.ros} 
+                    ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
+                    height={'100%'} 
+                    width={'100%'} 
+                    rotate={360} 
+                    hidden={detection}
+                  />
+                </div>
+                <div className="camera-view">
+                  <h3 className="camera-title">Motion Detection</h3>
+                  <ImageViewer 
+                    ros={this.state.ros} 
+                    ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
+                    height={'100%'} 
+                    width={'100%'} 
+                    rotate={360} 
+                    hidden={detection}
+                  />
+                </div>
               </div>
             </div>
-            
-            <div className="secondary-cameras">
-              <div className="camera-view">
-                <h3 className="camera-title">QR Detection</h3>
-                <ImageViewer 
-                  ros={this.state.ros} 
-                  ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
-                  height={'100%'} 
-                  width={'100%'} 
-                  rotate={360} 
-                  hidden={false}
-                />
-              </div>
-              <div className="camera-view">
-                <h3 className="camera-title">Hazmat Detection</h3>
-                <ImageViewer 
-                  ros={this.state.ros} 
-                  ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
-                  height={'100%'} 
-                  width={'100%'} 
-                  rotate={360} 
-                  hidden={detection}
-                />
-              </div>
-              <div className="camera-view">
-                <h3 className="camera-title">Color Test</h3>
-                <ImageViewer 
-                  ros={this.state.ros} 
-                  ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
-                  height={'100%'} 
-                  width={'100%'} 
-                  rotate={360} 
-                  hidden={false}
-                />
-              </div>
-              <div className="camera-view">
-                <h3 className="camera-title">Motion Detection</h3>
-                <ImageViewer 
-                  ros={this.state.ros} 
-                  ImageCompressedTopic={'/usb_cam/image_raw/compressed'} 
-                  height={'100%'} 
-                  width={'100%'} 
-                  rotate={360} 
-                  hidden={detection}
-                />
-              </div>
-            </div>
-          </div>
         </main>
         
         <footer className="app-footer">
-          <div className="robot-visualization">
-            <FlipperVisualization 
-              flipperDegreeFront={readRobotFlipperAngleFront} 
-              pitchDegree={readRobotPitchAngle} 
-              flipperDegreeRear={readRobotFlipperAngleRear}
-            />
-          </div>
-          
-          <div className="robot-status">
-            <div className="status-panels">
-              <div className="status-panel flipper-status">
-                <h4>Flipper Status</h4>
-                <div className="status-item">
-                  <span>Front:</span> {readRobotFlipperAngleFront}°
-                </div>
-                <div className="status-item">
-                  <span>Rear:</span> {readRobotFlipperAngleRear}°
-                </div>
-              </div>
+          <div className="footer-content">
+            <div className="robot-control-section">
               
-              <div className="status-panel orientation-status">
-                <h4>Orientation</h4>
-                <div className="status-item">
-                  <span>Pitch:</span> {readRobotPitchAngle}°
-                </div>
-              </div>
               
-              <div className="status-panel speed-status">
-                <h4>Speed</h4>
-                <div className="status-item">
-                  <span>Average:</span> {readRobotSpeed} Km/h
+              <div className="robot-status-wrapper">
+                <div className="robot-visualization">
+                  <h4>Robot Visualization</h4>
+                  <div className="visualization-container">
+                    {/* Gazebo simulation iframe instead of FlipperVisualization component */}
+                    <iframe 
+                      src={`http://${window.location.hostname}:8080/vnc.html?autoconnect=true`} 
+                      title="Gazebo Robot Visualization"
+                      className="gazebo-mini-viewer"
+                    />
+                  </div>
                 </div>
-                <div className="status-item">
-                  <span>Left:</span> {readRobotSpeedLeft} rpm
-                </div>
-                <div className="status-item">
-                  <span>Right:</span> {readRobotSpeedRight} rpm
+                
+                <div className="robot-status">
+                  <h4>Robot Status</h4>
+                  <div className="status-panels">
+                    <div className="status-panel flipper-status">
+                      <h5>Flipper</h5>
+                      <div className="status-item">
+                        <span>Front:</span> {readRobotFlipperAngleFront}°
+                      </div>
+                      <div className="status-item">
+                        <span>Rear:</span> {readRobotFlipperAngleRear}°
+                      </div>
+                    </div>
+                    
+                    <div className="status-panel orientation-status">
+                      <h5>Orientation</h5>
+                      <div className="status-item">
+                        <span>Pitch:</span> {readRobotPitchAngle}°
+                      </div>
+                    </div>
+                    
+                  <div className="status-panel speed-status">
+                      <h5>Speed</h5>
+                      <div className="status-item">
+                        <span>Average:</span> {readRobotSpeed} Km/h
+                      </div>
+                      <div className="status-item">
+                        <span>Left:</span> {readRobotSpeedLeft} rpm
+                      </div>
+                      <div className="status-item">
+                        <span>Right:</span> {readRobotSpeedRight} rpm
+                      </div>
+                  </div>
+                  <div className="control-buttons">
+                    <Button variant={startButton ? "danger" : "primary"} onClick={() => this.setState({ startButton: !startButton })} className="action-button">
+                        {startButton ? "Stop" : "Start"}
+                    </Button>
+                    <Button variant={detection ? "danger" : "primary"} onClick={() => this.setState({ detection: !detection })} className="action-button">
+                      {detection ? "Detection Off" : "Detection On"}
+                    </Button>
+                  </div>  
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div className="control-buttons">
-              <Button 
-                variant={startButton ? "danger" : "primary"} 
-                onClick={() => this.setState({ startButton: !startButton })}
-                className="action-button"
-              >
-                {startButton ? "Stop" : "Start"}
-              </Button>
-              <Button 
-                variant="primary" 
-                onClick={() => this.setState({ detection: !detection })}
-                className="action-button"
-              >
-                {detection ? "Detection Off" : "Detection On"}
-              </Button>
             </div>
           </div>
         </footer>
