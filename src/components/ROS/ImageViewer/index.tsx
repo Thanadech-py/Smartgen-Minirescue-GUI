@@ -74,9 +74,9 @@ class ImageViewer extends Component<IProps, IState> {
     }
     else{
       return (
-        // <div id="image-container">
+        <div id="image-container">
           <img className='Image' id="ros-image"  src={ConnectionLostIMG} height={this.props.height} width={this.props.width}/>
-        // </div>
+        </div>
       );
     }
     

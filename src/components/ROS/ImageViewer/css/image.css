@@ -1,11 +1,14 @@
-.Image{
-    display: block;
-    /* margin: auto; */
+#image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
 
+.Image {
     height: auto;
     max-height: 100%;
-
     width: auto;
     max-width: 100%;
-
 }

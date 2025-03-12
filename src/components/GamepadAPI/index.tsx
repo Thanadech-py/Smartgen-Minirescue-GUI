@@ -16,7 +16,8 @@ interface GamepadComponentState {
   sensorJoyTopic: ROSLIB.Topic<ROSLIB.Message>
   robotSpeedLeft: number;
   robotSpeedRight: number;
-  robotSpeedFlipper: number;
+  readRobotFlipperAngleFront: number;
+  readRobotFlipperAngleRear: number;
   boostMode : boolean;
   onetimeTicker : boolean;
 }
@@ -39,7 +40,8 @@ class GamepadComponent extends Component<GamepadComponentProps, GamepadComponent
       }),
       robotSpeedLeft: 0,
       robotSpeedRight: 0,
-      robotSpeedFlipper: 0,
+      readRobotFlipperAngleFront: 0,
+      readRobotFlipperAngleRear: 0,
       boostMode : false,
       onetimeTicker : false,
     };
@@ -132,35 +134,45 @@ class GamepadComponent extends Component<GamepadComponentProps, GamepadComponent
         this.props.onButtonsChange([...gamepad.buttons]);
       }
 
-      if (gamepad.buttons[4].pressed == 0 && gamepad.buttons[6].pressed == 0) {
+      if (gamepad.buttons[12].pressed == 0 && gamepad.buttons[13].pressed == 0) {
         this.setState({ robotSpeedLeft: 0 })
       }
-      else if (gamepad.buttons[4].pressed == 1) {
+      else if (gamepad.buttons[12].pressed == 1) {
         this.setState({ robotSpeedLeft: this.state.boostMode ? 147 : 294 })
       }
-      else if (gamepad.buttons[6].pressed == 1) {
+      else if (gamepad.buttons[13].pressed == 1) {
         this.setState({ robotSpeedLeft: -(this.state.boostMode ? 147 : 294) })
       }
 
 
-      if (gamepad.buttons[5].pressed == 0 && gamepad.buttons[7].pressed == 0) {
+      if (gamepad.buttons[12].pressed == 0 && gamepad.buttons[13].pressed == 0) {
         this.setState({ robotSpeedRight: 0 })
       }
-      else if (gamepad.buttons[5].pressed == 1) {
+      else if (gamepad.buttons[12].pressed == 1) {
         this.setState({ robotSpeedRight: (this.state.boostMode ? 147 : 294) })
       }
-      else if (gamepad.buttons[7].pressed == 1) {
+      else if (gamepad.buttons[13].pressed == 1) {
         this.setState({ robotSpeedRight: - (this.state.boostMode ? 147 : 294) })
       }
 
-      if (gamepad.buttons[3].pressed == 0 && gamepad.buttons[0].pressed == 0) {
-        this.setState({ robotSpeedFlipper: 0 })
+      if (gamepad.buttons[7].pressed == 0 && gamepad.buttons[5].pressed == 0) {
+        this.setState({ readRobotFlipperAngleFront: 0 })
       }
-      else if (gamepad.buttons[3].pressed == 1) {
-        this.setState({ robotSpeedFlipper: 16999 })
+      else if (gamepad.buttons[7].pressed == 1) {
+        this.setState({ readRobotFlipperAngleFront: 16999 })
       }
-      else if (gamepad.buttons[0].pressed == 1) {
-        this.setState({ robotSpeedFlipper: -16999 })
+      else if (gamepad.buttons[5].pressed == 1) {
+        this.setState({ readRobotFlipperAngleFront: -16999 })
+      }
+
+      if (gamepad.buttons[6].pressed == 0 && gamepad.buttons[4].pressed == 0) {
+        this.setState({ readRobotFlipperAngleRear: 0 })
+      }
+      else if (gamepad.buttons[6].pressed == 1) {
+        this.setState({ readRobotFlipperAngleRear: 16999 })
+      }
+      else if (gamepad.buttons[4].pressed == 1) {
+        this.setState({ readRobotFlipperAngleRear: -16999 })
       }
 
       if(gamepad.buttons[2].pressed){
@@ -203,7 +215,7 @@ class GamepadComponent extends Component<GamepadComponentProps, GamepadComponent
 
       // Publish the message to the ROS topic
       if (this.props.joyEnable) {
-        let publishFloat = [this.state.robotSpeedRight, this.state.robotSpeedLeft, this.state.robotSpeedFlipper]
+        let publishFloat = [this.state.robotSpeedRight, this.state.robotSpeedLeft, this.state.readRobotFlipperAngleFront, this.state.readRobotFlipperAngleRear]
         this.publishJoyMessage(gamepad.axes , gamepad.buttons)
         this.publishFloat32MultiArray(publishFloat);
       }
