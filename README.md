@@ -1,4 +1,15 @@
-# iRAP-Minirescue-GUI Example 
+# Smartgen-Minirescue-GUI Example 
+This Web-application has been create for using as a robot controller interface for a Thailand Open ROS and Smart Robor Compettion 2025 
+
+in Rapidly Manuafacturing Robot Challenge (RMRC) 
+
+
+## Reference
+This Web-Application is develop from iRAP-Minirescue-GUI 
+that created by iRAP Robot 
+
+Original : https://github.com/NonStopBle/iRAP-Minirescue-GUI
+
 
 ## Installation
 
