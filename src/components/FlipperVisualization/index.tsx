@@ -1,18 +1,18 @@
-import React, { Component, ChangeEvent, RefObject } from 'react';
+import React, { Component, RefObject } from 'react';
 import { Image } from 'react-bootstrap';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-import background_map from './resources/robot_bg.png';
+import background_map from './resources/robot_background_x.png';
 import robot from '../FlipperVisualization/resources/Body.png';
-import robot_lift1 from '../FlipperVisualization/resources/Flipper Front.png';
-import robot_lift2 from '../FlipperVisualization/resources/Flipper Rear.png';
+import robot_lift_front from '../FlipperVisualization/resources/Flipper Front.png';
+import robot_lift_rear from '../FlipperVisualization/resources/Flipper Rear.png';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
 interface MapProps {
-   pitchDegree: number;
-   flipperDegreeFront: number;
-   flipperDegreeRear: number;
+    pitchDegree: number;
+    flipperDegreeFront: number;
+    flipperDegreeRear: number;
 }
 
 interface MapState {
@@ -21,125 +21,116 @@ interface MapState {
 
 class FlipperVisualization extends Component<MapProps, MapState> {
     private robotImageRef: RefObject<HTMLImageElement>;
-    interval: NodeJS.Timeout | null = null;
 
     constructor(props: MapProps) {
         super(props);
         this.state = {
-          state: false,
+            state: false,
         };
         this.robotImageRef = React.createRef();
     }
 
     robotRenderComponents = () => {
-        const robotImageStyleA: React.CSSProperties = {
+        const robotImageStyle: React.CSSProperties = {
             position: 'absolute',
-            top: 'px',
-            right: '10px',
-            width: '280px',
+            top: '60%',
+            left: '47%',
+            transform: 'translate(-50%, -50%)',
+            width: '400px',
             height: 'auto',
-            justifyContent: 'center',
-            backgroundColor: 'transparent', // Ensure transparency
+            zIndex: 2,
         };
 
-        const LiftImageStyleA: React.CSSProperties = {
-            position: 'relative',
-            top: '107px',
-            left: '-15px',
-            transformOrigin: '75% 50%',
-            transform: `rotate(${this.props.flipperDegreeFront}deg) translate(0%,0%)`,
-            width: '100px',
+        const flipperStyleA: React.CSSProperties = {
+            position: 'absolute',
+            top: '72%',
+            left: '31.5%',
+            transform: `translate(-50%, -50%) rotate(${this.props.flipperDegreeFront}deg)`,
+            transformOrigin: 'center',
+            width: '200px',
             height: 'auto',
-            justifyContent: 'center',
-            backgroundColor: 'transparent', // Ensure transparency
+            zIndex: 3,
         };
 
-        const LiftImageStyleB: React.CSSProperties = {
-            position: 'relative',
-            top: '55px',
-            right: '-85px',
-            transformOrigin: '75% 50%',
-            transform: `rotate(${this.props.flipperDegreeRear}deg) translate(0%,0%)`,
-            width: '100px',
+        const flipperStyleB: React.CSSProperties = {
+            position: 'absolute',
+            top: '75%',
+            left: '68.25%',
+            transform: `translate(-50%, -50%) rotate(${this.props.flipperDegreeRear}deg)`,
+            transformOrigin: 'center',
+            width: '200px',
             height: 'auto',
-            justifyContent: 'center',
-            backgroundColor: 'transparent', // Ensure transparency
+            zIndex: 3,
         };
 
-        const painterConfig: React.CSSProperties = {
+        const containerStyle: React.CSSProperties = {
             position: 'relative',
-            top: '-50%',
-            left: '0%',
-            backgroundColor: 'transparent', // Ensure transparency
-        };
-
-        const setImagePoint: React.CSSProperties = {
-            position: 'relative',
-            top: '50%',
-            left: '25%',
-            width: '50%',
-            height: '1%',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
             justifyContent: 'center',
-            backgroundColor: 'transparent', // Ensure transparency
+            alignItems: 'center',
         };
 
         return (
-            <div style={painterConfig}>
-                <div style={setImagePoint}>
-                    <Image
-                        src={robot}
-                        alt="Robot"
-                        style={robotImageStyleA}
-                        className="robot-image img-fluid"
-                        ref={this.robotImageRef}
-                    />
-                    <Image
-                        src={robot_lift1}
-                        alt="Flipper Front"
-                        style={LiftImageStyleA}
-                        className="robot-image img-fluid"
-                        ref={this.robotImageRef}
-                    />
-                    <Image
-                        src={robot_lift2}
-                        alt="Flipper Rear"
-                        style={LiftImageStyleB}
-                        className="robot-image img-fluid"
-                        ref={this.robotImageRef}
-                    />
-                </div>
+            <div style={containerStyle}>
+                <Image
+                    src={robot}
+                    alt="Robot"
+                    style={robotImageStyle}
+                    className="robot-image img-fluid"
+                    ref={this.robotImageRef}
+                />
+                <Image
+                    src={robot_lift_front}
+                    alt="Flipper"
+                    style={flipperStyleA}
+                    className="robot-image img-fluid"
+                />
+                <Image
+                    src={robot_lift_rear}
+                    alt="Flipper"
+                    style={flipperStyleB}
+                    className="robot-image img-fluid"
+                />
             </div>
         );
     };
 
     render() {
-        let axis_x = -80;
-        let axis_y = -70;
-        let scale = 1.5;
+        const containerStyle: React.CSSProperties = {
+            width: '100%',
+            height: '100%',
+            position: 'relative',
+        };
 
-        const setImageOrigin: React.CSSProperties = {
-            transformOrigin: '50% 50%',
-            transform: `rotate(${this.props.pitchDegree}deg) translate(0%,0%)`,
-            backgroundColor: 'transparent', // Ensure transparency
+        const backgroundStyle: React.CSSProperties = {
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+        };
+
+        const rotationContainerStyle: React.CSSProperties = {
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: `translate(-50%, -50%) rotate(${this.props.pitchDegree}deg)`,
+            transformOrigin: 'center',
+            width: '100%',
+            height: '100%',
         };
 
         return (
-            <TransformWrapper
-                initialScale={scale} minScale={scale} maxScale={scale}
-                initialPositionX={axis_x}
-                initialPositionY={axis_y}
-                minPositionX={axis_x}
-                maxPositionX={axis_x}
-                minPositionY={axis_y}
-                maxPositionY={axis_y}
-            >
-                <TransformComponent>
-                    <div style={setImageOrigin}>
-                        <Image src={background_map} fluid className="responsive-image" style={{ backgroundColor: 'transparent' }} />
-                        {this.robotRenderComponents()}
-                    </div>
-                </TransformComponent>
-            </TransformWrapper> 
+            <div style={containerStyle}>
+                <Image 
+                    src={background_map} 
+                    fluid 
+                    style={backgroundStyle}
+                />
+                <div style={rotationContainerStyle}>
+                    {this.robotRenderComponents()}
+                </div>
+            </div>
         );
     }
 }

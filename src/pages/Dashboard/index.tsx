@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ROSLIB from 'roslib';
-import { Button } from 'react-bootstrap';
+import { Button, Container, Row, Col, Card, Badge } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 
@@ -12,6 +12,8 @@ import configs from '../../configs';
 import { initROSMasterURI } from '../../components/ROS/Connector/ROSConnector';
 import ImageViewer from '../../components/ROS/ImageViewer';
 import GamepadComponent from '../../components/GamepadAPI';
+import FlipperVisualization from '/home/thxncdzch/Smartgen-MiniRescue-GUI/src/components/FlipperVisualization';
+import RobotArmStatus from '../../components/RobotArmStatus';
 
 interface IProps { }
 
@@ -21,9 +23,6 @@ interface IState {
   joyConnection: boolean;
   cameraA: string;
   attachState: boolean;
-  detection: boolean;
-  startButton: boolean;
-  showGazebo: boolean;
   readRobotFlipperAngleFront: number;
   readRobotFlipperAngleRear: number;
   readRobotSpeedLeft: number;
@@ -31,15 +30,20 @@ interface IState {
   readRobotSpeed: number;
   readRobotPitchAngle: number;
   previousUpdate: number;
+  // Arm status states
+  joint1Angle: number;
+  joint2Angle: number;
+  joint3Angle: number;
+  gripperStatus: string;
+  ping: number;
+  pingStatus: 'low' | 'medium' | 'high';
 }
 
 class App extends Component<IProps, IState> {
-  private gazeboViewer: React.RefObject<HTMLIFrameElement>;
+  private pingInterval: NodeJS.Timeout | null = null;
 
   constructor(props: IProps) {
     super(props);
-
-    this.gazeboViewer = React.createRef();
 
     this.state = {
       ros: initROSMasterURI(configs.ROSMasterURL.url),
@@ -47,9 +51,6 @@ class App extends Component<IProps, IState> {
       cameraA: "",
       attachState: false,
       joyConnection: false,
-      startButton: false,
-      detection: false,
-      showGazebo: false, // Default to not showing Gazebo
       readRobotFlipperAngleFront: 0,
       readRobotFlipperAngleRear: 0,
       readRobotSpeedRight: 0,
@@ -57,6 +58,13 @@ class App extends Component<IProps, IState> {
       readRobotSpeed: 0,
       readRobotPitchAngle: 0,
       previousUpdate: 0,
+      // Initialize arm status
+      joint1Angle: 0,
+      joint2Angle: 0,
+      joint3Angle: 0,
+      gripperStatus: 'closed',
+      ping: 0,
+      pingStatus: 'low',
     };
   }
 
@@ -122,25 +130,62 @@ class App extends Component<IProps, IState> {
       console.log("ROS : Can't connect to ros master : ", configs.ROSMasterURL.url);
       this.setState({ robotConnection: false });
     });
+
+    this.startPing();
   }
 
-  toggleGazebo = () => {
-    this.setState(prevState => ({ showGazebo: !prevState.showGazebo }));
+  componentWillUnmount() {
+    if (this.pingInterval) {
+      clearInterval(this.pingInterval);
+    }
   }
+
+  startPing = () => {
+    // Ping every 2 seconds
+    this.pingInterval = setInterval(() => {
+      const startTime = Date.now();
+      fetch('/api/ping')  // Replace with your actual API endpoint
+        .then(() => {
+          const pingTime = Date.now() - startTime;
+          let pingStatus: 'low' | 'medium' | 'high' = 'low';
+          
+          if (pingTime > 200) {
+            pingStatus = 'high';
+          } else if (pingTime > 100) {
+            pingStatus = 'medium';
+          }
+          
+          this.setState({
+            ping: pingTime,
+            pingStatus
+          });
+        })
+        .catch(() => {
+          this.setState({
+            ping: -1,
+            pingStatus: 'high'
+          });
+        });
+    }, 2000);
+  };
 
   render() {
     const { 
       robotConnection, 
-      joyConnection, 
-      startButton, 
-      detection,
-      showGazebo,
+      joyConnection,
       readRobotFlipperAngleFront,
       readRobotFlipperAngleRear,
       readRobotPitchAngle,
       readRobotSpeed,
       readRobotSpeedLeft,
-      readRobotSpeedRight
+      readRobotSpeedRight,
+      // Arm status props
+      joint1Angle,
+      joint2Angle,
+      joint3Angle,
+      gripperStatus,
+      ping,
+      pingStatus,
     } = this.state;
 
     return (
@@ -150,8 +195,8 @@ class App extends Component<IProps, IState> {
           joypadTopicName={'/gui/output/robot_control'} 
           onJoyStickConnection={(connection) => {
             this.setState({ joyConnection: connection });
-          }} 
-          joyEnable={startButton} 
+          }}
+          joyEnable={true}
         />
         
         <header className="app-header">
@@ -162,9 +207,15 @@ class App extends Component<IProps, IState> {
             <div className="status-indicators">
               <div className="status-icon">
                 <img src={wifi} alt="Wifi Status" />
-                <span className={robotConnection ? "connected" : "disconnected"}>
-                  {robotConnection ? "Connected" : "Disconnected"}
-                </span>
+                <div className="connection-status">
+                  <span className={`connection-text ${robotConnection ? "connected" : "disconnected"}`}>
+                    {robotConnection ? "Connected" : "Disconnected"}
+                  </span>
+                  <div className="ping-info">
+                    <div className={`ping-dot ${robotConnection ? pingStatus : 'disconnected'}`} />
+                    {robotConnection && <span>{ping === -1 ? 'N/A' : `${ping}ms`}</span>}
+                  </div>
+                </div>
               </div>
               <div className="status-icon">
                 <img src={joy} alt="Joystick Status" />
@@ -177,154 +228,138 @@ class App extends Component<IProps, IState> {
         </header>
         
         <main className="app-content">
-            <div className="camera-container">
-              <div className="primary-cameras">
-                <div className="camera-view">
-                  <h3 className="camera-title">Front Camera</h3>
-                  <ImageViewer 
-                    ros={this.state.ros} 
-                    ImageCompressedTopic={'/usb_cam1/image_raw/compressed'} 
-                    height={'100%'} 
-                    width={'100%'} 
-                    rotate={360} 
-                    hidden={false}
-                  />
+          <Container fluid>
+            <Row>
+              <Col md={8}>
+                <div className="camera-container">
+                  <div className="primary-cameras">
+                    <div className="camera-view">
+                      <h3 className="camera-title">Front Camera</h3>
+                      <ImageViewer 
+                        ros={this.state.ros} 
+                        ImageCompressedTopic={'/front_cam/image_raw/compressed'} 
+                        height={'100%'} 
+                        width={'100%'} 
+                        rotate={360} 
+                        hidden={false}
+                      />
+                    </div>
+                    <div className="camera-view">
+                      <h3 className="camera-title">Rear Camera</h3>
+                      <ImageViewer 
+                        ros={this.state.ros} 
+                        ImageCompressedTopic={'/rear_cam/image_raw/compressed'} 
+                        height={'100%'} 
+                        width={'100%'} 
+                        rotate={180} 
+                        hidden={false}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="secondary-cameras">
+                    <div className="camera-view">
+                      <h3 className="camera-title">QR Detection</h3>
+                      <ImageViewer 
+                        ros={this.state.ros} 
+                        ImageCompressedTopic={'/qr_detected_image/compressed'} 
+                        height={'100%'} 
+                        width={'100%'} 
+                        rotate={360} 
+                        hidden={false}
+                      />
+                    </div>
+                    <div className="camera-view">
+                      <h3 className="camera-title">Hazmat Detection</h3>
+                      <ImageViewer 
+                        ros={this.state.ros} 
+                        ImageCompressedTopic={'/hazmat/detections'} 
+                        height={'100%'} 
+                        width={'100%'} 
+                        rotate={360} 
+                        hidden={false}
+                      />
+                    </div>
+                    <div className="camera-view">
+                      <h3 className="camera-title">Color Test</h3>
+                      <ImageViewer 
+                        ros={this.state.ros} 
+                        ImageCompressedTopic={'/detection_result/compressed'} 
+                        height={'100%'} 
+                        width={'100%'} 
+                        rotate={360} 
+                        hidden={false}
+                      />
+                    </div>
+                    <div className="camera-view">
+                      <h3 className="camera-title">Motion Detection</h3>
+                      <ImageViewer 
+                        ros={this.state.ros} 
+                        ImageCompressedTopic={'/detected_point/image/compressed'} 
+                        height={'100%'} 
+                        width={'100%'} 
+                        rotate={360} 
+                        hidden={false}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="camera-view">
-                  <h3 className="camera-title">Rear Camera</h3>
-                  <ImageViewer 
-                    ros={this.state.ros} 
-                    ImageCompressedTopic={'/usb_cam2/image_raw/compressed'} 
-                    height={'100%'} 
-                    width={'100%'} 
-                    rotate={360} 
-                    hidden={false}
-                  />
-                </div>
-              </div>
-              
-              <div className="secondary-cameras">
-                <div className="camera-view">
-                  <h3 className="camera-title">QR Detection</h3>
-                  <ImageViewer 
-                    ros={this.state.ros} 
-                    ImageCompressedTopic={'/qr_detected_image/compressed'} 
-                    height={'100%'} 
-                    width={'100%'} 
-                    rotate={360} 
-                    hidden={detection}
-                  />
-                </div>
-                <div className="camera-view">
-                  <h3 className="camera-title">Hazmat Detection</h3>
-                  <ImageViewer 
-                    ros={this.state.ros} 
-                    ImageCompressedTopic={'/hazmat/detections'} 
-                    height={'100%'} 
-                    width={'100%'} 
-                    rotate={360} 
-                    hidden={detection}
-                  />
-                </div>
-                <div className="camera-view">
-                  <h3 className="camera-title">Color Test</h3>
-                  <ImageViewer 
-                    ros={this.state.ros} 
-                    ImageCompressedTopic={'/usb_cam2/image_raw/compressed'} 
-                    height={'100%'} 
-                    width={'100%'} 
-                    rotate={360} 
-                    hidden={detection}
-                  />
-                </div>
-                <div className="camera-view">
-                  <h3 className="camera-title">Motion Detection</h3>
-                  <ImageViewer 
-                    ros={this.state.ros} 
-                    ImageCompressedTopic={'/usb_cam2/image_raw/compressed'} 
-                    height={'100%'} 
-                    width={'100%'} 
-                    rotate={360} 
-                    hidden={detection}
-                  />
-                </div>
-              </div>
-            </div>
-        </main>
-        
-        <footer className="app-footer">
-          <div className="footer-content">
-            <div className="robot-control-section">
-              <div className="robot-status-wrapper">
-                <div className="robot-visualization">
+              </Col>
+              <Col md={4}>
+                <div className="flipper-visualization-panel">
                   <h4>Robot Visualization</h4>
-                  <div className="visualization-container" style={{ display: 'flex', gap: '2px' }}>
-                    <div className="gazebo-container" style={{ flex: 1 }}>
-                      <h5 className="gazebo-title">Flipper Veiw</h5>
-                      <iframe 
-                        src={`ws://192.168.10.200:9090/vnc.html?autoconnect=true`} 
-                        title="Gazebo Robot Top View"
-                        className="gazebo-mini-viewer"
-                      />
+                  <div className="visualization-container">
+                    <FlipperVisualization 
+                      pitchDegree={readRobotPitchAngle}
+                      flipperDegreeFront={readRobotFlipperAngleFront}
+                      flipperDegreeRear={readRobotFlipperAngleRear}
+                    />
+                  </div>
+                </div>
+
+                <div className="robot-metrics-panel">
+                  <h4>Robot Metrics</h4>
+                  <div className="metrics-grid">
+                    <div className="metric-item">
+                      <span className="metric-label">Speed</span>
+                      <span className="metric-value">{readRobotSpeed} m/s</span>
                     </div>
-                    
-                    <div className="gazebo-container" style={{ flex: 1 }}>
-                      <h5 className="gazebo-title">Robot ARM View</h5>
-                      <iframe 
-                        src={`ws://192.168.10.200:9090/vnc.html?autoconnect=true`} 
-                        title="Gazebo Robot Side View"
-                        className="gazebo-mini-viewer"
-                      />
+                    <div className="metric-item">
+                      <span className="metric-label">Left Speed</span>
+                      <span className="metric-value">{readRobotSpeedLeft} m/s</span>
+                    </div>
+                    <div className="metric-item">
+                      <span className="metric-label">Right Speed</span>
+                      <span className="metric-value">{readRobotSpeedRight} m/s</span>
+                    </div>
+                    <div className="metric-item">
+                      <span className="metric-label">Pitch Angle</span>
+                      <span className="metric-value">{readRobotPitchAngle}°</span>
+                    </div>
+                    <div className="metric-item">
+                      <span className="metric-label">Front Flipper</span>
+                      <span className="metric-value">{readRobotFlipperAngleFront}°</span>
+                    </div>
+                    <div className="metric-item">
+                      <span className="metric-label">Rear Flipper</span>
+                      <span className="metric-value">{readRobotFlipperAngleRear}°</span>
                     </div>
                   </div>
                 </div>
-                
-                <div className="robot-status">
-                  <h4>Robot Status</h4>
-                  <div className="status-panels">
-                    <div className="status-panel flipper-status">
-                      <h5>Flipper</h5>
-                      <div className="status-item">
-                        <span>Front:</span> {readRobotFlipperAngleFront}°
-                      </div>
-                      <div className="status-item">
-                        <span>Rear:</span> {readRobotFlipperAngleRear}°
-                      </div>
-                    </div>
-                    
-                    <div className="status-panel orientation-status">
-                      <h5>Orientation</h5>
-                      <div className="status-item">
-                        <span>Pitch:</span> {readRobotPitchAngle}°
-                      </div>
-                    </div>
-                    
-                    <div className="status-panel speed-status">
-                      <h5>Speed</h5>
-                      <div className="status-item">
-                        <span>Average:</span> {readRobotSpeed} Km/h
-                      </div>
-                      <div className="status-item">
-                        <span>Left:</span> {readRobotSpeedLeft} rpm
-                      </div>
-                      <div className="status-item">
-                        <span>Right:</span> {readRobotSpeedRight} rpm
-                      </div>
-                    </div>
-                    <div className="control-buttons">
-                      <Button variant={startButton ? "danger" : "primary"} onClick={() => this.setState({ startButton: !startButton })} className="action-button">
-                          {startButton ? "Stop" : "Start"}
-                      </Button>
-                      <Button variant={detection ? "primary" : "danger"} onClick={() => this.setState({ detection: !detection })} className="action-button">
-                        {detection ? "Detection On" : "Detection Off"}
-                      </Button>
-                    </div>  
-                  </div>
+
+                <div className="robot-arm-status-section">
+                  <RobotArmStatus
+                    joint1Angle={joint1Angle}
+                    joint2Angle={joint2Angle}
+                    joint3Angle={joint3Angle}
+                    gripperStatus={gripperStatus}
+                  />
                 </div>
-              </div>
-            </div>
-          </div>
-        </footer>
+              </Col>
+            </Row>
+          </Container>
+        </main> 
+            
       </div>
     );
   }

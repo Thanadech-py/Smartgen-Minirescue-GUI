@@ -1,0 +1,134 @@
+.arm-status-panel {
+    background-color: #2c2d30;
+    border: 1px solid #3a3b3d;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    margin: 0;
+    width: 100%;
+}
+
+.arm-status-header {
+    background-color: #1f2022;
+    border-bottom: 1px solid #3a3b3d;
+    padding: 12px 20px;
+}
+
+.arm-status-header h4 {
+    color: #e4e6eb;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.arm-status-header h4::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 16px;
+    background-color: #60a5fa;
+    border-radius: 2px;
+}
+
+.arm-status-body {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.joint-status {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+}
+
+.joint-item {
+    flex: 1;
+    background-color: #1f2022;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #3a3b3d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.joint-item:hover {
+    background-color: #2c2d30;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.joint-item span {
+    color: #a1a1aa;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.gripper-status {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+}
+
+.gripper-item {
+    flex: 1;
+    background-color: #1f2022;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #3a3b3d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gripper-item span {
+    color: #a1a1aa;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.badge {
+    padding: 6px 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    min-width: 60px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.badge.bg-primary {
+    background-color: #60a5fa !important;
+    color: #1f2022;
+}
+
+.badge.bg-success {
+    background-color: #4ade80 !important;
+    color: #1f2022;
+}
+
+.badge.bg-danger {
+    background-color: #f87171 !important;
+    color: #1f2022;
+}
+
+.badge.bg-info {
+    background-color: #38bdf8 !important;
+    color: #1f2022;
+}
+
+@media (max-width: 768px) {
+    .joint-status,
+    .gripper-status {
+        flex-direction: column;
+    }
+    
+    .joint-item,
+    .gripper-item {
+        width: 100%;
+    }
+} 
